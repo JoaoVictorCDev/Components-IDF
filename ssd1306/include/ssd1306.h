@@ -6,7 +6,7 @@
 
 esp_err_t ssd1306_init(void); //Existe uma função com esse nome e essa assinatura.
 
-esp_err_t ssd1306_write_command(uint8_t command)
+// esp_err_t ssd1306_write_command(uint8_t command);
 
 
 
