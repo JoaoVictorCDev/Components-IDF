@@ -56,45 +56,63 @@ static esp_err_t ssd1306_write_command(uint8_t command)
     }
 
     uint8_t buffer[] = {
-        0x00,
-        command};
+        0x00, command};
 
+    return i2c_master_transmit(oled_handle, buffer, sizeof(buffer), 1000);
+}
 
-    
+static esp_err_t ssd1306_write_command_with_param(uint8_t command, uint8_t param)
+{
+
+    if (oled_handle == NULL)
+    {
+        return ESP_ERR_INVALID_STATE;
+    }
+
+    uint8_t buffer[] = {
+        0x00, command, param};
+
     return i2c_master_transmit(oled_handle, buffer, sizeof(buffer), 1000);
 }
 
 // static esp_err_t ssd1306_write_data(){}
 
-static esp_err_t ssd1306_init_display(void){
+static esp_err_t ssd1306_init_display(void)
+{
     esp_err_t ret;
 
-    ret = ssd1306_write_command(0xAE); //Display OFF
+    ret = ssd1306_write_command(0xAE); // Display OFF
+    if (ret != ESP_OK)
+    {
+        return ret;
+    }
+
+    ret = ssd1306_write_command_with_param(0x8D, 0x14); // Turn on the charge pump.
+    if (ret != ESP_OK)
+    {
+        return ret;
+    }
+
+    ret = ssd1306_write_command_with_param(0x20, 0x00); // Sets the horizontal mode.
+    if (ret != ESP_OK)
+    {
+        return ret;
+    }
+
+    ret = ssd1306_write_command(0xA1); // Sets the horizontal mode.
+    if (ret != ESP_OK)
+    {
+        return ret;
+    }
+
+    ret = ssd1306_write_command(0xC8); // Sets the horizontal mode.
+    if (ret != ESP_OK)
+    {
+        return ret;
+    }
+
+    ret = ssd1306_write_command_with_param(0x81, 0x7F);
     if(ret != ESP_OK){
-        return ret;
-    }
-
-    ret = ssd1306_write_command(0x8D); //Turn on the charge pump.
-    if (ret != ESP_OK)
-    {
-        return ret;
-    }
-    
-    ret = ssd1306_write_command(0x14); //Turn on the charge pump.
-    if (ret != ESP_OK)
-    {
-        return ret;
-    }
-
-    ret = ssd1306_write_command(0x20); //Sets the horizontal mode.
-    if (ret != ESP_OK)
-    {
-        return ret;
-    }
-
-    ret = ssd1306_write_command(0x00); //Sets the horizontal mode.
-    if (ret != ESP_OK)
-    {
         return ret;
     }
 }
@@ -105,20 +123,22 @@ esp_err_t ssd1306_init(void)
 
     ret = ssd1306_create_bus();
 
-    if(ret != ESP_OK){
+    if (ret != ESP_OK)
+    {
         return ret;
     }
 
     ret = ssd1306_create_device();
 
-
-    if(ret != ESP_OK){
+    if (ret != ESP_OK)
+    {
         return ret;
     }
 
     ret = ssd1306_init_display();
-    
-    if(ret != ESP_OK){
+
+    if (ret != ESP_OK)
+    {
         return ret;
     }
 
